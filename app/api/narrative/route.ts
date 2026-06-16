@@ -1,7 +1,8 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { getDemoNarrative } from "@/lib/demo-narratives";
 import type { DecomposeResult, Domain, NarrativeResponse } from "@/types";
+
+export const runtime = "edge";
 
 const SYSTEM_PROMPT = `You are AXIOM's Narrative Adapter — Layer 2 of a dual-engine STEM tutor.
 Your job: transform EXACT structured JSON from the deterministic Combinatorial Decomposer into vivid explanations for students aged 13–18.
@@ -21,21 +22,29 @@ async function callAnthropic(result: DecomposeResult, domain: Domain): Promise<s
   if (!key) return null;
 
   try {
-    const client = new Anthropic({ apiKey: key });
-    const message = await client.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 600,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: `Domain: ${domain}\n\nDecompose result (use exactly, do not recalculate):\n${JSON.stringify(result, null, 2)}`,
-        },
-      ],
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 600,
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: "user",
+            content: `Domain: ${domain}\n\nDecompose result (use exactly, do not recalculate):\n${JSON.stringify(result, null, 2)}`,
+          },
+        ],
+      }),
     });
-
-    const block = message.content[0];
-    if (block.type === "text") return block.text;
+    if (!res.ok) return null;
+    const data = await res.json();
+    const block = data.content?.[0];
+    if (block?.type === "text") return block.text;
     return null;
   } catch (e) {
     console.error("Anthropic error:", e);

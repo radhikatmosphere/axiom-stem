@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "edge";
+
 const WALLET_API = process.env.WALLET_API_URL || "https://wallet.radhikachain.xyz";
 const AXIOM_API = process.env.AXIOM_API_URL;
 
