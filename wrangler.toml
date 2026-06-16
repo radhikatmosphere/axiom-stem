@@ -1,0 +1,10 @@
+# Cloudflare Pages — AXIOM STEM Tutor
+# Deploy: npm run build && npx wrangler pages deploy .next --project-name=axiom-stem
+# Or use scripts/deploy.sh
+
+name = "axiom-stem"
+compatibility_date = "2026-05-17"
+pages_build_output_dir = "out"
+
+# For Next.js static export, set output: 'export' in next.config.mjs
+# Custom domain: axiom.radhikachain.xyz (configure in CF Pages dashboard)

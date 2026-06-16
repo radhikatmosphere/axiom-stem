@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --void: #0a0a0f;
+  --panel: #12121a;
+  --cyan: #00f5d4;
+  --gold: #f7b731;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--void);
+  color: #e8e8f0;
+  min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 245, 212, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(247, 183, 49, 0.05), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@layer components {
+  .axiom-card {
+    @apply bg-panel border border-white/5 rounded-xl p-5 transition-all duration-300;
+  }
+
+  .axiom-card:hover {
+    @apply border-cyan/20 bg-panel-hover shadow-lg shadow-cyan/5;
+  }
+
+  .axiom-card.active {
+    @apply border-cyan/40 shadow-lg shadow-cyan/10;
+  }
+
+  .axiom-btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .axiom-btn-primary {
+    @apply axiom-btn bg-cyan text-void hover:bg-cyan-bright;
+  }
+
+  .axiom-btn-secondary {
+    @apply axiom-btn bg-white/5 border border-white/10 hover:border-cyan/30 hover:bg-white/10;
+  }
+
+  .axiom-input {
+    @apply w-full bg-void/50 border border-white/10 rounded-lg px-3 py-2 text-sm
+           focus:outline-none focus:border-cyan/50 focus:ring-1 focus:ring-cyan/30
+           placeholder:text-white/30 transition-colors;
+  }
+
+  .axiom-label {
+    @apply block text-xs uppercase tracking-wider text-white/50 mb-1.5;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-cyan to-gold bg-clip-text text-transparent;
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(90deg, transparent, rgba(0, 245, 212, 0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--void);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 212, 0.3);
+  border-radius: 3px;
+}
