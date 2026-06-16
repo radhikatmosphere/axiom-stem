@@ -2,8 +2,10 @@
 
 **Compute First. Explain Second.**
 
-[![RadhikaChain](https://img.shields.io/badge/ecosystem-RadhikaChain-00F5D4)](https://radhikachain.xyz)
-[![DSH Hacks V1](https://img.shields.io/badge/hackathon-DSH%20Hacks%20V1-F7B731)](https://dsh-hacks-v1.devpost.com/)
+[![Live Demo](https://img.shields.io/badge/demo-live-00F5D4)](https://axiom-stem.pages.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-F7B731.svg)](LICENSE)
+[![DSH Hacks V1](https://img.shields.io/badge/hackathon-DSH%20Hacks%20V1-blue)](https://dsh-hacks-v1.devpost.com/)
+[![RadhikaChain](https://img.shields.io/badge/ecosystem-RadhikaChain-00dddd)](https://radhikachain.xyz)
 [![Anthropic](https://img.shields.io/badge/narrative-Anthropic%20Claude-7c3aed)](https://anthropic.com)
 
 > Part of the **RADHIKATMOSPHERE** ecosystem · [`radhikatmosphere/axiom-stem`](https://github.com/radhikatmosphere/axiom-stem)
@@ -83,6 +85,20 @@ Narrative Adapter powered by [**Anthropic Claude**](https://anthropic.com) via `
 - [radhika-chain](https://github.com/radhikatmosphere/radhika-chain) — L1 blockchain + Workers
 - [radhikachain.xyz](https://radhikachain.xyz) — Ecosystem landing
 
+## Hackathon Submission (DSH Hacks V1)
+
+| Item | Link |
+|------|------|
+| **Live demo** | https://axiom-stem.pages.dev |
+| **Devpost** | https://dsh-hacks-v1.devpost.com/ |
+| **Submission docs** | [`submission/`](submission/) |
+| **One-pager** | [`submission/PROJECT_DESCRIPTION.md`](submission/PROJECT_DESCRIPTION.md) |
+| **Demo script** | [`submission/DEMO_VIDEO_SCRIPT.md`](submission/DEMO_VIDEO_SCRIPT.md) |
+
 ## License
 
-MIT · Built for DSH Hacks V1 with SuperGrok assistance
+This project is licensed under the **MIT License** — see [LICENSE](LICENSE).
+
+Copyright (c) 2026 [RADHIKATMOSPHERE](https://github.com/radhikatmosphere)
+
+Built for **DSH Hacks V1** · AI × STEM Education

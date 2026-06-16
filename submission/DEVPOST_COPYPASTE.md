@@ -50,8 +50,10 @@ Next.js, TypeScript, Tailwind CSS, Anthropic Claude, Cloudflare Pages, Framer Mo
 ## Links to fill in AFTER deploy
 | Field | Value |
 |-------|-------|
-| **Project Website** | `https://axiom-stem.pages.dev` (or custom domain below) |
-| **GitHub** | `https://github.com/radhikatmosphere/axiom-stem` |
+| **Project Website** | **https://axiom-stem.pages.dev** ✅ LIVE |
+| **GitHub** | `https://github.com/radhikatmosphere/axiom-stem` (push if not done) |
+
+**Verified working:** Homepage 200 OK · `/api/narrative` returns demo narratives (no API key needed for judges)
 
 ## Demo Video (required, 2–3 min)
 Record screen showing:

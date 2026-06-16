@@ -1,8 +1,28 @@
 {
   "name": "axiom-stem",
   "version": "1.0.0",
-  "private": true,
+  "private": false,
   "description": "AXIOM — Adaptive eXplanatory Intelligence via Orthogonal Modeling (RadhikaChain ecosystem)",
+  "license": "MIT",
+  "author": "RADHIKATMOSPHERE (https://github.com/radhikatmosphere)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/radhikatmosphere/axiom-stem.git"
+  },
+  "homepage": "https://axiom-stem.pages.dev",
+  "bugs": {
+    "url": "https://github.com/radhikatmosphere/axiom-stem/issues"
+  },
+  "keywords": [
+    "stem-education",
+    "ai-tutor",
+    "anthropic",
+    "nextjs",
+    "hackathon",
+    "radhikachain",
+    "combinatorics",
+    "edtech"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
