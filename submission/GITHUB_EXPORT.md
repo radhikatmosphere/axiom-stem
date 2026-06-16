@@ -19,7 +19,7 @@ git commit -m "feat: AXIOM AI — dual-engine STEM tutor (RadhikaChain ecosystem
 
 Built for DSH Hacks V1 + RADHIKATMOSPHERE.
 Layer 1: Deterministic combinatorial engine (Punnett, combinatorics, electron config, harmonics)
-Layer 2: Anthropic Claude narrative adapter + agent-core fallback
+Layer 2: SuperGrok (xAI Grok) narrative adapter + agent-core fallback + Splunk axiom index
 Gamification: XP, badges, Bhakti wallet integration"
 
 git branch -M main
@@ -30,7 +30,7 @@ git push -u origin main
 ## 3. Repo Settings
 
 - **Avatar:** Upload `public/axiom-logo.jpg` (square crop)
-- **Topics:** `nextjs`, `typescript`, `stem-education`, `anthropic`, `edtech`, `gamification`, `radhikachain`, `hackathon`, `ai-tutor`
+- **Topics:** `nextjs`, `typescript`, `stem-education`, `supergrok`, `xai`, `splunk`, `edtech`, `gamification`, `radhikachain`, `hackathon`, `ai-tutor`
 - **Website:** `https://axiom.radhikachain.xyz` (after deploy)
 - **Description:** `Compute first. Explain second. Dual-engine STEM tutor — RadhikaChain ecosystem.`
 

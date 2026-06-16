@@ -40,7 +40,7 @@ export default function NarrativePanel({ narrative, provider, loading }: Narrati
   }
 
   const providerLabel =
-    provider === "anthropic" ? "Claude 3.5 Sonnet" : provider === "agent-core" ? "RadhikaChain Agent-Core" : "Demo Narrative";
+    provider === "supergrok" ? "SuperGrok (Grok 4.3)" : provider === "agent-core" ? "RadhikaChain Agent-Core" : "Demo Narrative";
 
   return (
     <motion.div

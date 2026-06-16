@@ -22,18 +22,18 @@ AI tutors sound confident but get STEM math wrong — wrong Punnett probabilitie
 ## What it does
 AXIOM separates computation from communication:
 • Layer 1 — Combinatorial Decomposer: pure TypeScript engines for genetics (Punnett grids), math (P/C), chemistry (Aufbau), physics (harmonics). Instant, exact, offline-capable.
-• Layer 2 — Narrative Adapter: Anthropic Claude transforms the verified JSON into vivid explanations for ages 13–18 — hooks, analogies, Socratic questions, micro-experiments.
+• Layer 2 — Narrative Adapter: SuperGrok (xAI Grok) transforms the verified JSON into vivid explanations for ages 13–18 — hooks, analogies, Socratic questions, micro-experiments.
 
 Integrated with RadhikaChain ecosystem: XP, badges, streaks, wallet Bhakti scores.
 
 ## How we built it
-Next.js 14, TypeScript, Tailwind, Framer Motion. @anthropic-ai/sdk (edge fetch) for narratives. Demo fallback works without API keys. Deployed on Cloudflare Pages. agent-core fallback via RadhikaChain Workers.
+Next.js 15, TypeScript, Tailwind, Framer Motion. xAI Grok API (SuperGrok) for narratives. Demo fallback works without API keys. Splunk HEC observability (index axiom). Deployed on Cloudflare Pages. agent-core fallback via RadhikaChain Workers.
 
 ## Challenges
 Making Layer 2 never recalculate — only narrate injected JSON. Edge deployment with API routes on Cloudflare.
 
 ## Accomplishments
-4 working STEM domains, 3-tier narrative fallback (Anthropic → agent-core → demo), gamification, production UI in one sprint.
+4 working STEM domains, 3-tier narrative fallback (SuperGrok → agent-core → demo), Splunk dashboards, gamification, production UI in one sprint.
 
 ## What we learned
 AI excels at explanation when truth is pre-computed. Separating orthogonal concerns beats monolithic LLM tutoring.
@@ -44,7 +44,7 @@ Phenotype mapping, PDF export, voice narration, 5th domain (population genetics)
 
 ## Built With (tags)
 ```
-Next.js, TypeScript, Tailwind CSS, Anthropic Claude, Cloudflare Pages, Framer Motion, RadhikaChain
+Next.js, TypeScript, Tailwind CSS, SuperGrok, Splunk, Cloudflare Pages, Framer Motion, RadhikaChain
 ```
 
 ## Links to fill in AFTER deploy
@@ -55,15 +55,18 @@ Next.js, TypeScript, Tailwind CSS, Anthropic Claude, Cloudflare Pages, Framer Mo
 
 **Verified working:** Homepage 200 OK · `/api/narrative` returns demo narratives (no API key needed for judges)
 
-## Demo Video (required, 2–3 min)
-Record screen showing:
-1. Open live URL
-2. Genetics: Aa × aa → Decompose → narrative appears
-3. Math: C(5,3) = 10
-4. Show XP bar + badges
-5. Say: "Compute first. Explain second."
+## Demo Video (required, 2–3 min) ✅ READY
+**Upload file:** `submission/AXIOM_DEMO_VIDEO.mp4` (~104s, 1280×720, H.264 + AAC)
 
-Script: `submission/DEMO_VIDEO_SCRIPT.md`
+Real Playwright screen recording of **https://axiom-stem.pages.dev** with sweet natural female voiceover (Microsoft Jenny Neural via edge-tts). Shows:
+1. Live app load
+2. Genetics: Load example Aa × aa → Decompose → Layer 2 narrative
+3. Combinatorics C(5,3) = 10
+4. Chemistry (Fe electron config)
+5. Physics harmonics (440 Hz)
+6. XP / progress panel
+
+Re-record anytime: `npm run demo:record` · Script: `scripts/record-demo.mjs`
 
 ## One-Page PDF (required)
 1. Open `submission/PROJECT_DESCRIPTION.md`

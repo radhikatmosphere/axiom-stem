@@ -13,7 +13,7 @@
 - Auto-narrative trigger on decompose
 
 ### Hour 3 — Layer 2 Narrative
-- `app/api/narrative/route.ts` with Anthropic SDK
+- `app/api/narrative/route.ts` with SuperGrok (xAI Grok API)
 - Engineered system prompt for 13–18yo audience
 - Demo fallback narratives in `lib/demo-narratives.ts`
 

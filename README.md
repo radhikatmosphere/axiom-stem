@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-F7B731.svg)](LICENSE)
 [![DSH Hacks V1](https://img.shields.io/badge/hackathon-DSH%20Hacks%20V1-blue)](https://dsh-hacks-v1.devpost.com/)
 [![RadhikaChain](https://img.shields.io/badge/ecosystem-RadhikaChain-00dddd)](https://radhikachain.xyz)
-[![Anthropic](https://img.shields.io/badge/narrative-Anthropic%20Claude-7c3aed)](https://anthropic.com)
+[![SuperGrok](https://img.shields.io/badge/narrative-SuperGrok%20Grok-7c3aed)](https://x.ai)
 
 > Part of the **RADHIKATMOSPHERE** ecosystem · [`radhikatmosphere/axiom-stem`](https://github.com/radhikatmosphere/axiom-stem)
 
@@ -19,12 +19,21 @@ Most AI tutors **guess** their way through STEM math. Students get confident-sou
 ```
 Layer 1 — Combinatorial Decomposer (TypeScript, zero network, instant)
     ↓ exact JSON
-Layer 2 — Narrative Adapter (Anthropic Claude / agent-core / demo)
+Layer 2 — Narrative Adapter (SuperGrok / agent-core / demo)
     ↓ vivid explanation for ages 13–18
 Student understands structure FIRST, then meaning
 ```
 
-Inspired by the Jyotish **Sragdharā** meter — decomposing complex forms into fundamental combinatorial building blocks.
+## Chandas Inspiration
+
+Layer 1 follows the **Chandas** (Sanskrit prosody) method — especially **Sragdharā** (4 pādas × 21 syllables, gaṇa feet, yati caesuras). Pingala's *prastāra* enumerated valid rhythmic patterns centuries before modern combinatorics; AXIOM does the same for STEM: decompose into atomic units, enumerate exactly, then narrate meaning.
+
+| Chandas | AXIOM Layer 1 |
+|---------|---------------|
+| Stanza / pādas | STEM domains |
+| Gaṇa (L/G syllables) | Combinatorial atoms (alleles, C(n,r) steps) |
+| Yati (caesura) | Step boundaries in output |
+| Prastāra | Punnett grids, formula expansion |
 
 ## Domains
 
@@ -35,8 +44,23 @@ Inspired by the Jyotish **Sragdharā** meter — decomposing complex forms into 
 | Chemistry | Aufbau principle | `Fe` → full + noble-gas config |
 | Physics | Harmonic series | `440 Hz` → frequencies + wavelengths |
 
-## RadhikaChain Integration
+## Ecosystem Plan
 
+AXIOM is the **education-layer application** in the [RadhikaChain ecosystem](https://radhikachain.xyz). Full architecture and whitepaper: [WHITEPAPER.md §9.5](../WHITEPAPER.md) (parent `radhika-chain` repo).
+
+| Surface | URL | Role |
+|---------|-----|------|
+| **This app (live)** | https://axiom-stem.pages.dev | Layer 1 decompose + Layer 2 narrative |
+| Custom domain (planned) | https://axiom.radhikachain.xyz | DNS alias (pending) |
+| Ecosystem landing | https://radhikachain.xyz | Install, Firebase auth hub |
+| Wallet / Bhakti | https://wallet.radhikachain.xyz | Karma tier overlay |
+| Hello-OS | https://radhika-os.pages.dev | OS-level ecosystem entry |
+
+**Data flow:** Decompose (Layer 1) → Narrative (Layer 2) → Award XP → Optional Bhakti lookup → Persist to D1 `axiom_progress` via `axiom.worker`.
+
+**Auth:** Google sign-in via Firebase (`radhikatmosphere` project), token verified at `https://radhikachain.xyz/api/auth/firebase`. Setup: [`docs/FIREBASE_AUTH.md`](docs/FIREBASE_AUTH.md).
+
+**Integration points:**
 - **Bhakti scores** — wallet link shows ecosystem karma tier
 - **XP / badges / streaks** — Octalysis-aligned White Hat gamification
 - **agent-core** — `/agent/educate` fallback narrative routing via Bedrock/Workers AI
@@ -49,7 +73,7 @@ git clone https://github.com/radhikatmosphere/axiom-stem.git
 cd axiom-stem
 npm install
 cp .env.example .env.local
-# Optional: add ANTHROPIC_API_KEY (works without it via demo narratives)
+# Optional: add XAI_API_KEY (works without it via demo narratives)
 npm run dev
 ```
 
@@ -59,37 +83,45 @@ Open [http://localhost:3000](http://localhost:3000)
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | No | Layer 2 primary (Claude 3.5 Sonnet) |
+| `XAI_API_KEY` | No | Layer 2 primary (SuperGrok / Grok 4.3) |
 | `AGENT_CORE_URL` | No | RadhikaChain agent-core fallback |
+| `SPLUNK_HEC_URL` + `SPLUNK_HEC_TOKEN` | No | Splunk index `axiom` — see [`docs/SPLUNK_DASHBOARDS.md`](docs/SPLUNK_DASHBOARDS.md) |
 | `WALLET_API_URL` | No | Bhakti API (default: wallet.radhikachain.xyz) |
 
 ## Deploy
 
 ```bash
-# Vercel (fastest for hackathon demo)
-npm run build && npx vercel --prod
+# Cloudflare Pages (verified production path)
+npm run pages:deploy
 
-# Cloudflare Pages
-chmod +x scripts/deploy.sh
-./scripts/deploy.sh
+# Vercel (optional alternative)
+npm run build && npx vercel --prod
 ```
 
-Set `ANTHROPIC_API_KEY` in your hosting dashboard.
+Set `XAI_API_KEY` and Splunk vars in your hosting dashboard.
 
-## Anthropic Attribution
+## Observability (Splunk)
 
-Narrative Adapter powered by [**Anthropic Claude**](https://anthropic.com) via `@anthropic-ai/sdk`. This repository is owned by [**radhikatmosphere**](https://github.com/radhikatmosphere) — not Anthropic.
+Events (`decompose`, `narrative_generated`, `auth_connect`, `error`) ship to Splunk index **`axiom`**. Full Dashboard Studio guide with SPL panels: [**docs/SPLUNK_DASHBOARDS.md**](docs/SPLUNK_DASHBOARDS.md).
+
+## SuperGrok Attribution
+
+Narrative Adapter powered by [**SuperGrok (xAI Grok)**](https://x.ai) via the xAI API. Owned by [**radhikatmosphere**](https://github.com/radhikatmosphere).
 
 ## Related Repos
 
-- [radhika-chain](https://github.com/radhikatmosphere/radhika-chain) — L1 blockchain + Workers
-- [radhikachain.xyz](https://radhikachain.xyz) — Ecosystem landing
+| Repo | GitHub | Contents |
+|------|--------|----------|
+| **axiom-stem** | https://github.com/radhikatmosphere/axiom-stem | This app — Next.js 15 STEM tutor (MIT) |
+| **radhika-chain** | https://github.com/radhikatmosphere/radhika-chain | L1 blockchain, Workers, agent-core, whitepaper |
 
 ## Hackathon Submission (DSH Hacks V1)
 
 | Item | Link |
 |------|------|
 | **Live demo** | https://axiom-stem.pages.dev |
+| **Demo video** | [`submission/AXIOM_DEMO_VIDEO.mp4`](submission/AXIOM_DEMO_VIDEO.mp4) — real UI + natural voiceover |
+| **Re-record video** | `npm run demo:record` |
 | **Devpost** | https://dsh-hacks-v1.devpost.com/ |
 | **Submission docs** | [`submission/`](submission/) |
 | **One-pager** | [`submission/PROJECT_DESCRIPTION.md`](submission/PROJECT_DESCRIPTION.md) |

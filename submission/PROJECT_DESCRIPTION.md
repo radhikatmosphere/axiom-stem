@@ -12,8 +12,9 @@ AXIOM is an AI-powered STEM tutor for students aged 13–18 that solves the #1 f
 - **Physics:** Harmonic series → frequency, wavelength, musical note per harmonic
 
 ### Layer 2: Narrative Adapter (AI)
-- Anthropic Claude 3.5 Sonnet transforms exact JSON into vivid explanations
-- Fallback: RadhikaChain agent-core (Bedrock/Workers AI)
+- SuperGrok (xAI Grok 4.3) transforms exact JSON into vivid explanations
+- Fallback: RadhikaChain agent-core (Workers AI / Bedrock)
+- Observability: Splunk HEC → index `axiom` with Dashboard Studio panels
 - Demo mode: high-quality pre-written narratives (no API key needed)
 
 ### Gamification (RadhikaChain Ecosystem)

@@ -124,8 +124,23 @@ export default function Home() {
         }).catch(() => {});
       }
 
+      fetch("/api/telemetry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event: "decompose", domain }),
+      }).catch(() => {});
+
       await fetchNarrative(res, domain);
     } catch (e) {
+      fetch("/api/telemetry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "error",
+          domain,
+          metadata: { source: "decompose", message: e instanceof Error ? e.message : "unknown" },
+        }),
+      }).catch(() => {});
       setError(e instanceof Error ? e.message : "Decomposition failed");
       setResult(null);
     } finally {
@@ -144,6 +159,15 @@ export default function Home() {
     };
     setProgress(updated);
     saveProgress(updated);
+
+    fetch("/api/telemetry", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "auth_connect",
+        metadata: { chain: user.chain },
+      }),
+    }).catch(() => {});
 
     if (user.chain === "wallet") {
       try {
@@ -352,7 +376,7 @@ export default function Home() {
       <footer className="border-t border-white/5 mt-12 py-6 text-center text-xs text-white/30">
         <p>
           AXIOM · <a href="https://github.com/radhikatmosphere/axiom-stem" className="text-cyan/60 hover:text-cyan">radhikatmosphere/axiom-stem</a>
-          {" · "}Narrative by Anthropic Claude · Part of RadhikaChain ecosystem
+          {" · "}Narrative by SuperGrok · Part of RadhikaChain ecosystem
         </p>
       </footer>
     </div>

@@ -92,7 +92,7 @@ export interface NarrativeRequest {
 
 export interface NarrativeResponse {
   narrative: string;
-  provider: "anthropic" | "agent-core" | "demo";
+  provider: "supergrok" | "agent-core" | "demo";
 }
 
 export interface ProgressState {

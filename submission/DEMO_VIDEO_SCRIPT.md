@@ -1,36 +1,44 @@
-# AXIOM Demo Video Script (~3 minutes)
+# AXIOM Demo Video Script (~2:30 – 3:00)
 
-## 0:00–0:20 — Hook
-> "Most AI tutors guess their way through math. Watch what happens when you compute first, then explain."
+**Recorded asset:** `submission/AXIOM_DEMO_VIDEO.mp4` (~104s)  
+**Re-record:** `npm run demo:record`
 
-Show AXIOM homepage. Point to tagline: **Compute First. Explain Second.**
+---
 
-## 0:20–0:50 — Problem
-> "Ask ChatGPT a Punnett square. It might sound right but get probabilities wrong. AXIOM's Layer 1 never guesses."
+## [0:00 – 0:15] Introduction
 
-## 0:50–1:30 — Genetics Demo
-1. Click **Genetics** domain card
-2. Enter `Aa × aa`, click **Decompose**
-3. Show Punnett grid appearing with exact percentages
-4. Narrative panel auto-fills with story + Socratic question
-5. Click **Copy JSON** — show structured output
+> "Hi! Welcome to AXIOM — where we compute first, and explain second. A dual-engine STEM tutor that never guesses math."
 
-> "Layer 1 computed this in pure TypeScript. Layer 2 only received the JSON."
+Show homepage: **Compute First. Explain Second.**
 
-## 1:30–2:00 — Math + Chemistry Quick Tour
-- Switch to **Combinatorics**: C(5,3) = 10 with step breakdown
-- Switch to **Chemistry**: Fe → orbital diagram
+---
 
-## 2:00–2:30 — Gamification
-- Show XP bar increment after decompose
-- Click **Link Wallet** → Bhakti tier appears
-- Show badges: "Gene Weaver", "First Truth"
+## [0:15 – 0:45] Problem + Solution
 
-## 2:30–2:50 — Ecosystem
-- Click RadhikaChain link in header
-> "AXIOM is part of the RADHIKATMOSPHERE ecosystem — blockchain karma meets STEM mastery."
+> "Most AI tutors guess. AXIOM's Layer 1 is pure TypeScript — exact Punnett grids, combinatorics, chemistry, physics. Layer 2 uses SuperGrok to explain the verified JSON only."
 
-## 2:50–3:00 — Close
-> "AXIOM. Compute first. Explain second. GitHub: radhikatmosphere/axiom-stem"
+---
+
+## [0:45 – 1:30] Live Demo
+
+1. **Genetics** — Load example `Aa × aa` → Decompose → Punnett grid + narrative  
+2. **Combinatorics** — C(5,3) = 10  
+3. **Chemistry** — Fe electron config  
+4. **Physics** — 440 Hz harmonics  
+5. Scroll to XP / progress panel  
+
+> "Layer 2 never recalculates — it only narrates what Layer 1 proved."
+
+---
+
+## [1:30 – 2:00] Technical Highlights
+
+> "Built with Next.js 15 and TypeScript on Cloudflare Pages. SuperGrok with agent-core and demo fallbacks. Inspired by Sragdharā meter — decompose structure before meaning. Splunk dashboards track every decompose and narrative."
+
+---
+
+## [2:00 – 2:30] Ecosystem + Close
+
+> "Part of RadhikaChain — XP, badges, Bhakti karma. Live at axiom-stem.pages.dev. GitHub: radhikatmosphere/axiom-stem. Built for DSH Hacks. Thank you!"
 
 Show logo + live URL.

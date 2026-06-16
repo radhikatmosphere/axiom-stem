@@ -5,7 +5,7 @@
 - [x] Layer 1: Combinatorics P/C with steps
 - [x] Layer 1: Chemistry Aufbau electron config
 - [x] Layer 1: Physics harmonic series
-- [x] Layer 2: Anthropic Claude narrative adapter
+- [x] Layer 2: SuperGrok (xAI Grok) narrative adapter
 - [x] Layer 2: agent-core `/agent/educate` fallback
 - [x] Layer 2: Demo narratives (no API key required)
 - [x] Auto-narrative after decompose
@@ -37,5 +37,6 @@
 
 ## Deploy
 - [ ] Live URL: axiom.radhikachain.xyz or Vercel
-- [ ] ANTHROPIC_API_KEY in production env
+- [ ] XAI_API_KEY in production env
+- [ ] Splunk HEC → index `axiom` (see docs/SPLUNK_DASHBOARDS.md)
 - [ ] Demo video recorded (2–3 min)
