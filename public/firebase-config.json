@@ -1,0 +1,18 @@
+{
+  "apiKey": "AIzaSyDkyY_4StNM2__D8HmgHsrCmw5IcqMvyiQ",
+  "authDomain": "radhikatmosphere.firebaseapp.com",
+  "projectId": "radhikatmosphere",
+  "storageBucket": "radhikatmosphere.firebasestorage.app",
+  "messagingSenderId": "542056449739",
+  "appId": "1:542056449739:web:891ff8ce9be8d0cf3d7d4e",
+  "measurementId": "G-SKXLBW48EN",
+  "authorizedDomains": [
+    "radhikatmosphere.firebaseapp.com",
+    "radhikatmosphere.web.app",
+    "radhikachain.xyz",
+    "www.radhikachain.xyz",
+    "axiom-stem.pages.dev",
+    "axiom.radhikachain.xyz",
+    "localhost"
+  ]
+}

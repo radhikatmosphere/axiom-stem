@@ -16,6 +16,7 @@ export const BADGES: Record<string, { name: string; description: string; domain?
   streak_7: { name: "Week Warrior", description: "7-day learning streak" },
   level_5: { name: "Rising Scholar", description: "Reached level 5" },
   radhika_linked: { name: "Chain Learner", description: "Connected RadhikaChain wallet" },
+  firebase_linked: { name: "Google Scholar", description: "Signed in with Firebase Google" },
 };
 
 export function xpForLevel(level: number): number {
@@ -86,6 +87,7 @@ export function awardXp(domain: Domain, current: ProgressState): ProgressState {
   if (streak >= 7) badges.add("streak_7");
   if (level >= 5) badges.add("level_5");
   if (current.walletAddress) badges.add("radhika_linked");
+  if (current.authChain === "firebase") badges.add("firebase_linked");
 
   return {
     ...current,

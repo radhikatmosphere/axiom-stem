@@ -102,6 +102,9 @@ export interface ProgressState {
   badges: string[];
   domains: Record<Domain, number>;
   walletAddress?: string;
+  authChain?: "wallet" | "firebase";
+  firebaseUid?: string;
+  email?: string;
   bhaktiTier?: number;
   bhaktiConfidence?: number;
 }

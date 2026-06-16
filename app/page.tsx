@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Dna, Calculator, FlaskConical, Waves, Copy, Check,
@@ -10,7 +10,8 @@ import { decompose } from "@/lib/decomposers";
 import { awardXp, loadProgress, saveProgress } from "@/lib/gamification";
 import NarrativePanel from "@/components/NarrativePanel";
 import ProgressPanel from "@/components/ProgressPanel";
-import WalletConnect from "@/components/WalletConnect";
+import AuthPanel, { type AuthUser } from "@/components/AuthPanel";
+import { loadFirebaseSession } from "@/lib/firebase-client";
 import type {
   Domain, DecomposeResult, GeneticsResult, MathResult,
   ChemistryResult, PhysicsResult, ProgressState,
@@ -33,6 +34,31 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [jsonCopied, setJsonCopied] = useState(false);
   const [progress, setProgress] = useState<ProgressState>(loadProgress);
+  const [authUser, setAuthUser] = useState<AuthUser | undefined>();
+
+  useEffect(() => {
+    const saved = loadProgress();
+    if (saved.walletAddress) {
+      setAuthUser({
+        address: saved.walletAddress,
+        chain: saved.authChain ?? "wallet",
+        email: saved.email,
+        uid: saved.firebaseUid,
+      });
+    } else {
+      const fb = loadFirebaseSession();
+      if (fb) {
+        setAuthUser({ address: fb.address, chain: "firebase", email: fb.email, uid: fb.uid });
+        setProgress((p) => ({
+          ...p,
+          walletAddress: fb.address,
+          authChain: "firebase",
+          firebaseUid: fb.uid,
+          email: fb.email ?? undefined,
+        }));
+      }
+    }
+  }, []);
 
   // Inputs per domain
   const [parent1, setParent1] = useState("Aa");
@@ -107,25 +133,46 @@ export default function Home() {
     }
   }
 
-  async function handleWalletConnect(address: string) {
-    const updated = { ...progress, walletAddress: address };
+  async function handleAuthConnect(user: AuthUser) {
+    setAuthUser(user);
+    const updated: ProgressState = {
+      ...progress,
+      walletAddress: user.address,
+      authChain: user.chain,
+      firebaseUid: user.uid,
+      email: user.email ?? undefined,
+    };
     setProgress(updated);
     saveProgress(updated);
-    try {
-      const r = await fetch(`/api/progress?wallet=${address}`);
-      const data = await r.json();
-      if (data.bhakti?.bhakti) {
-        setProgress({
-          ...updated,
-          bhaktiTier: data.bhakti.bhakti.tier,
-          bhaktiConfidence: data.bhakti.bhakti.total_confidence,
-        });
-      }
-    } catch { /* local mode */ }
+
+    if (user.chain === "wallet") {
+      try {
+        const r = await fetch(`/api/progress?wallet=${user.address}`);
+        const data = await r.json();
+        if (data.bhakti?.bhakti) {
+          const withBhakti = {
+            ...updated,
+            bhaktiTier: data.bhakti.bhakti.tier,
+            bhaktiConfidence: data.bhakti.bhakti.total_confidence,
+          };
+          setProgress(withBhakti);
+          saveProgress(withBhakti);
+        }
+      } catch { /* local mode */ }
+    }
   }
 
-  function handleWalletDisconnect() {
-    const updated = { ...progress, walletAddress: undefined, bhaktiTier: undefined, bhaktiConfidence: undefined };
+  function handleAuthDisconnect() {
+    setAuthUser(undefined);
+    const updated: ProgressState = {
+      ...progress,
+      walletAddress: undefined,
+      authChain: undefined,
+      firebaseUid: undefined,
+      email: undefined,
+      bhaktiTier: undefined,
+      bhaktiConfidence: undefined,
+    };
     setProgress(updated);
     saveProgress(updated);
   }
@@ -171,10 +218,10 @@ export default function Home() {
             >
               RadhikaChain <ExternalLink size={10} />
             </a>
-            <WalletConnect
-              address={progress.walletAddress}
-              onConnect={handleWalletConnect}
-              onDisconnect={handleWalletDisconnect}
+            <AuthPanel
+              user={authUser}
+              onConnect={handleAuthConnect}
+              onDisconnect={handleAuthDisconnect}
             />
           </div>
         </div>
