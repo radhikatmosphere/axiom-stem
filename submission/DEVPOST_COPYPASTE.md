@@ -1,4 +1,4 @@
-# DSH Hacks V1 — COPY-PASTE FOR DEVPOST (1 hour deadline)
+# DSH Hacks V1 — COPY-PASTE FOR DEVPOST
 
 **Submit at:** https://dsh-hacks-v1.devpost.com/project-submissions/new
 
@@ -6,80 +6,123 @@
 
 ## Project Name
 ```
-AXIOM — Adaptive eXplanatory Intelligence via Orthogonal Modeling
+AXIOM AI — Dual-Engine Combinatoria
 ```
 
 ## Tagline / Short Description
 ```
-Compute first. Explain second. A dual-engine STEM tutor that computes exact math in TypeScript, then uses AI only to explain — never to guess.
+Compute first. Explain second. Dual-engine STEM tutor: exact combinatorial math in TypeScript, then AI only for vivid explanations — never for guessing.
 ```
 
-## About the Project (paste into description)
-```
+## About the Project (paste into the long description)
+
 ## Inspiration
-AI tutors sound confident but get STEM math wrong — wrong Punnett probabilities, wrong combinatorics, hallucinated electron configs. Students deserve truth before storytelling.
+
+Most AI tutors *guess*. They produce confident-sounding explanations of Punnett squares, combinations, electron configurations or harmonic series that are subtly (or completely) wrong. Students absorb the error and build fragile mental models.
+
+AXIOM was born from a simple but radical inversion: **compute first, explain second**.
+
+We looked back to the 2nd–3rd century BCE, to Piṅgala’s *Chandaḥśāstra* and the method of *prastāra* (systematic enumeration of metrical patterns). Long before modern combinatorics, Sanskrit prosodists decomposed complex structures into atomic units (*gaṇa*), marked boundaries (*yati*), and enumerated every valid possibility with absolute rigor. We asked: what if a modern STEM tutor did exactly the same?
+
+The result is a dual-engine system that never approximates probabilities, never hallucinates electron configurations, and never invents combinatorial steps. It calculates the exact structure first, then hands a perfect JSON to a narrative layer that turns it into vivid, Socratic, age-appropriate explanations for students 13+.
+
+Built in a high-pressure sprint for DSH Hacks V1 under the theme **AI × STEM Education**.
 
 ## What it does
-AXIOM separates computation from communication:
-• Layer 1 — Combinatorial Decomposer: pure TypeScript engines for genetics (Punnett grids), math (P/C), chemistry (Aufbau), physics (harmonics). Instant, exact, offline-capable.
-• Layer 2 — Narrative Adapter: SuperGrok (xAI Grok) transforms the verified JSON into vivid explanations for ages 13–18 — hooks, analogies, Socratic questions, micro-experiments.
 
-Integrated with RadhikaChain ecosystem: XP, badges, streaks, wallet Bhakti scores.
+AXIOM is a dual-engine STEM tutor:
+
+**Layer 1 — Combinatorial Decomposer** (pure TypeScript, zero network calls, instant)  
+Decomposes problems into atomic combinatorial units inspired by Chandas prosody and produces exact, machine-readable JSON. Supported domains:
+
+- **Genetics** → full Punnett grid enumeration + genotype/phenotype percentages
+- **Mathematics** → permutations and combinations with complete step-by-step expansion
+- **Chemistry** → electron configurations via the Aufbau principle (full + noble-gas notation)
+- **Physics** → harmonic series (frequencies + wavelengths from a fundamental)
+
+**Layer 2 — Narrative Adapter** (SuperGrok / xAI or agent-core fallback)  
+Takes the exact JSON and generates engaging, Socratic, story-driven explanations tailored for ages 13–18.
+
+Additional features:
+- Gamification (XP, badges, streaks)
+- Google sign-in via Firebase + progress persistence in Cloudflare D1
+- Optional Bhakti karma tier overlay from the RadhikaChain wallet
+- Full observability (events shipped to Splunk)
+- Demo mode that works even without API keys
+
+Live demo: https://axiom-stem.pages.dev
 
 ## How we built it
-Next.js 15, TypeScript, Tailwind, Framer Motion. xAI Grok API (SuperGrok) for narratives. Demo fallback works without API keys. Splunk HEC observability (index axiom). Deployed on Cloudflare Pages. agent-core fallback via RadhikaChain Workers.
 
-## Challenges
-Making Layer 2 never recalculate — only narrate injected JSON. Edge deployment with API routes on Cloudflare.
+- **Frontend**: Next.js 15 (App Router) + TypeScript + Tailwind CSS + Framer Motion
+- **Layer 1 engine**: Pure TypeScript combinatorial core (no external dependencies for the critical path)
+- **Layer 2**: SuperGrok (xAI API) as primary narrative engine, with agent-core / Workers AI fallback
+- **Backend & persistence**: Cloudflare Workers + D1
+- **Auth**: Firebase Authentication (Google)
+- **Observability**: Splunk HEC
+- **Deployment**: Cloudflare Pages
+- Built and deployed in a focused hackathon sprint
 
-## Accomplishments
-4 working STEM domains, 3-tier narrative fallback (SuperGrok → agent-core → demo), Splunk dashboards, gamification, production UI in one sprint.
+The architecture deliberately separates deterministic computation from probabilistic language generation so that the mathematical truth is never compromised by the LLM.
+
+## Challenges we ran into
+
+1. Designing a single combinatorial abstraction flexible enough for Punnett squares, C(n,r), Aufbau, and harmonic series without becoming a mess of special cases.
+2. Keeping Layer 1 completely deterministic and offline-capable while still producing rich enough JSON for the narrative layer to sound natural.
+3. Making the demo mode (no API keys) feel as polished as the full SuperGrok experience.
+4. Balancing the philosophical depth of the Chandas / Piṅgala inspiration with a clean, modern UX that students actually want to use.
+5. Shipping a production-ready dual-engine system under real time pressure.
+
+## Accomplishments that we're proud of
+
+- A working dual-engine system that *never* hallucinates the math — the core differentiator.
+- Full end-to-end product (decompose → narrate → gamify → persist → observe).
+- Clean mapping from ancient Sanskrit prosody (*prastāra*, *gaṇa*, *yati*) to modern STEM problems.
+- Live production deployment on Cloudflare Pages with real Firebase auth and D1 persistence.
+- Comprehensive documentation, demo video, and submission package.
+- Seamless integration path into the larger RadhikaChain / A.L.I.C.E. sovereign education layer.
 
 ## What we learned
-AI excels at explanation when truth is pre-computed. Separating orthogonal concerns beats monolithic LLM tutoring.
 
-## What's next
-Phenotype mapping, PDF export, voice narration, 5th domain (population genetics), LoRA fine-tuning on student profiles.
-```
+- Deterministic “compute-first” architecture is dramatically more trustworthy for STEM than pure LLM approaches.
+- Ancient combinatorial methods (especially Piṅgala’s recursive enumeration / Meru-prastāra) map surprisingly cleanly onto modern educational domains.
+- Students respond more strongly when they first see the exact structure and *then* receive the narrative.
+- Having a high-quality demo mode is non-negotiable for reliability during judging.
 
-## Built With (tags)
-```
-Next.js, TypeScript, Tailwind CSS, SuperGrok, Splunk, Cloudflare Pages, Framer Motion, RadhikaChain
-```
+## What's next for AXIOM AI — Dual-Engine Combinatoria
 
-## Links to fill in AFTER deploy
-| Field | Value |
-|-------|-------|
-| **Project Website** | **https://axiom-stem.pages.dev** ✅ LIVE |
-| **GitHub** | `https://github.com/radhikatmosphere/axiom-stem` (push if not done) |
-
-**Verified working:** Homepage 200 OK · `/api/narrative` returns demo narratives (no API key needed for judges)
-
-## Demo Video (required, 2–3 min) ✅ READY
-**Upload file:** `submission/AXIOM_DEMO_VIDEO.mp4` (~104s, 1280×720, H.264 + AAC)
-
-Real Playwright screen recording of **https://axiom-stem.pages.dev** with sweet natural female voiceover (Microsoft Jenny Neural via edge-tts). Shows:
-1. Live app load
-2. Genetics: Load example Aa × aa → Decompose → Layer 2 narrative
-3. Combinatorics C(5,3) = 10
-4. Chemistry (Fe electron config)
-5. Physics harmonics (440 Hz)
-6. XP / progress panel
-
-Re-record anytime: `npm run demo:record` · Script: `scripts/record-demo.mjs`
-
-## One-Page PDF (required)
-1. Open `submission/PROJECT_DESCRIPTION.md`
-2. Print to PDF or paste into Google Docs → Export PDF
-3. Upload to Devpost
-
-## Code PDF (alternative to GitHub)
-If repo not public yet: `git archive` or print key files from `lib/decomposers.ts` + `app/api/narrative/route.ts`
+- Expand domain coverage (advanced genetics, stoichiometry, wave mechanics, discrete math).
+- Deeper RadhikaChain integration: learning actions can generate verifiable Proof-of-Impact / Bhakti signals.
+- Classroom mode + teacher dashboard.
+- Multilingual narrative layer (starting with Spanish and English).
+- Mobile-responsive progressive web app + offline Layer 1 capability.
+- Open-source the combinatorial core as a standalone library.
+- Pilot programs with schools and STEM clubs.
+- Long-term vision: AXIOM becomes the education nervous system of the RadhikaChain / A.L.I.C.E. sovereign stack.
 
 ---
 
-## Judging angles (mention in video)
-- **Idea:** Fixes AI tutor inaccuracy via dual-engine architecture
-- **Implementation:** 4 domains, deterministic Layer 1, 3 narrative providers
-- **Design:** Cosmic UI, responsive, auto-narrative UX
-- **Presentation:** Live demo all 4 domains in under 3 min
+## Built With
+```
+Next.js
+TypeScript
+Tailwind CSS
+Framer Motion
+SuperGrok (xAI)
+Cloudflare Pages
+Cloudflare Workers
+Cloudflare D1
+Firebase
+Splunk
+RadhikaChain
+Piṅgala / Meru-prastāra combinatorics
+```
+
+## Links
+| Field | Value |
+|-------|-------|
+| **Project Website** | https://axiom-stem.pages.dev |
+| **GitHub** | https://github.com/radhikatmosphere/axiom-stem |
+
+## Demo Video
+Upload: `submission/AXIOM_DEMO_VIDEO.mp4`
