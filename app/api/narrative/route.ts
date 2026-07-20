@@ -1,112 +1,94 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDemoNarrative } from "@/lib/demo-narratives";
-import { logAxiomEvent } from "@/lib/splunk-hec";
-import { chatSuperGrok } from "@/lib/supergrok";
-import type { DecomposeResult, Domain, NarrativeResponse } from "@/types";
+import { computeAxiom, parseAxiomInput } from "@/lib/axiom-result";
+import { generateNarrative, type LearnerProfile } from "@/lib/narrative-service";
+import { getOpenAiNarrativeProviderFromEnv } from "@/lib/openai-narrative-provider";
+import { getFoundryNarrativeProviderFromEnv } from "@/lib/foundry-narrative-provider";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
-const SYSTEM_PROMPT = `You are AXIOM's Narrative Adapter — Layer 2 of a dual-engine STEM tutor.
-Your job: transform EXACT structured JSON from the deterministic Combinatorial Decomposer into vivid explanations for students aged 13–18.
+const MAX_BODY_BYTES = 12_000;
+const RATE_WINDOW_MS = 60_000;
+const RATE_LIMIT = 15;
+const requestWindows = new Map<string, { startedAt: number; count: number }>();
 
-RULES:
-- NEVER recalculate or guess math — the JSON is already correct
-- Use exciting hooks and real-world connections
-- Simple vivid language with analogies (when helpful, compare to Chandas prosody: decompose a verse into pādas before reciting meaning)
-- Include one Socratic question
-- Include one "Try this yourself" micro-experiment
-- Warm, empowering tone — never condescending
-- Use markdown: **bold** for key terms, short paragraphs
-- Keep response under 300 words`;
-
-async function callSuperGrok(
-  result: DecomposeResult,
-  domain: Domain
-): Promise<{ narrative: string | null; xaiError?: string; xaiStatus?: number }> {
-  const key = process.env.XAI_API_KEY;
-  if (!key) return { narrative: null, xaiError: "missing_api_key" };
-
-  const grok = await chatSuperGrok(key, {
-    system: SYSTEM_PROMPT,
-    user: `Domain: ${domain}\n\nDecompose result (use exactly, do not recalculate):\n${JSON.stringify(result, null, 2)}`,
-    maxTokens: 600,
-    temperature: 0.7,
-  });
-
-  if (grok.ok) return { narrative: grok.content };
-  return { narrative: null, xaiError: grok.error, xaiStatus: grok.status };
+function isRateLimited(request: NextRequest): boolean {
+  const key = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  const now = Date.now();
+  const current = requestWindows.get(key);
+  if (!current || now - current.startedAt >= RATE_WINDOW_MS) {
+    requestWindows.set(key, { startedAt: now, count: 1 });
+    if (requestWindows.size > 512) requestWindows.clear();
+    return false;
+  }
+  current.count += 1;
+  return current.count > RATE_LIMIT;
 }
 
-async function callAgentCore(result: DecomposeResult, domain: Domain): Promise<string | null> {
-  const url = process.env.AGENT_CORE_URL;
-  if (!url) return null;
+function parseLearner(value: unknown): LearnerProfile {
+  const learner = value && typeof value === "object" ? value as Record<string, unknown> : {};
+  return {
+    level: learner.level === "middle-school" || learner.level === "intro-college"
+      ? learner.level
+      : "high-school",
+    language: learner.language === "es" ? "es" : "en",
+  };
+}
+
+export async function POST(request: NextRequest) {
+  if (isRateLimited(request)) {
+    return NextResponse.json(
+      { error: "Too many explanation requests. Please wait a minute and try again." },
+      { status: 429, headers: { "Retry-After": "60" } }
+    );
+  }
+
+  let text: string;
+  try {
+    text = await request.text();
+  } catch {
+    return NextResponse.json({ error: "Could not read the request." }, { status: 400 });
+  }
+  if (Buffer.byteLength(text, "utf8") > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: "Request is too large. Use the provided STEM inputs." }, { status: 413 });
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    const parsed: unknown = JSON.parse(text);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("invalid");
+    body = parsed as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "Request must be valid JSON." }, { status: 400 });
+  }
+
+  const input = parseAxiomInput(body.domain, body.input);
+  if (!input) {
+    return NextResponse.json(
+      { error: "Invalid genetics or combinatorics input. Check the fields and try again." },
+      { status: 400 }
+    );
+  }
 
   try {
-    const res = await fetch(`${url.replace(/\/$/, "")}/agent/educate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ decomposeResult: result, domain, ageRange: "13-18" }),
-      signal: AbortSignal.timeout(15000),
+    // Recompute on the server. Client-provided results are never treated as evidence.
+    const axiomResult = computeAxiom(input);
+    const narrative = await generateNarrative(
+      axiomResult,
+      parseLearner(body.learner),
+      getOpenAiNarrativeProviderFromEnv(),
+      getFoundryNarrativeProviderFromEnv()
+    );
+    return NextResponse.json({
+      axiomResult,
+      narrative,
+      mode: narrative.provider === "openai" ? "openai" : "deterministic_fallback",
     });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.narrative ?? null;
-  } catch (e) {
-    console.error("Agent-core error:", e);
-    return null;
+  } catch {
+    // Do not log input or provider errors: either may contain sensitive learner text.
+    return NextResponse.json(
+      { error: "AXIOM could not compute this example. Check the input and try again." },
+      { status: 422 }
+    );
   }
 }
 
-export async function POST(req: NextRequest) {
-  const start = Date.now();
-  try {
-    const body = await req.json();
-    const result = body.result as DecomposeResult;
-    const domain = body.domain as Domain;
-
-    if (!result || !domain) {
-      return NextResponse.json({ error: "Missing result or domain" }, { status: 400 });
-    }
-
-    let narrative: string | null = null;
-    let provider: NarrativeResponse["provider"] = "demo";
-
-    const superGrok = await callSuperGrok(result, domain);
-    narrative = superGrok.narrative;
-    if (narrative) {
-      provider = "supergrok";
-    } else {
-      narrative = await callAgentCore(result, domain);
-      if (narrative) provider = "agent-core";
-    }
-
-    if (!narrative) {
-      narrative = getDemoNarrative(result, domain);
-      provider = "demo";
-    }
-
-    logAxiomEvent({
-      event: "narrative_generated",
-      domain,
-      severity: "info",
-      metadata: {
-        model: provider,
-        provider,
-        latency_ms: Date.now() - start,
-        ...(superGrok.xaiError && provider !== "supergrok"
-          ? { xai_error: superGrok.xaiError, ...(superGrok.xaiStatus ? { xai_status: superGrok.xaiStatus } : {}) }
-          : {}),
-      },
-    });
-
-    return NextResponse.json({ narrative, provider } satisfies NarrativeResponse);
-  } catch (e) {
-    console.error("Narrative route error:", e);
-    logAxiomEvent({
-      event: "error",
-      severity: "error",
-      metadata: { source: "narrative_route", message: String(e) },
-    });
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
-  }
-}
