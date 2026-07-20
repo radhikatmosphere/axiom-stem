@@ -14,14 +14,20 @@ import type {
 // ─── GENETICS: Punnett square decomposition ─────────────────────────────────
 
 function parseGenotype(genotype: string): [string, string] {
-  const g = genotype.trim().toUpperCase();
-  if (g.length !== 2) throw new Error("Genotype must be 2 alleles (e.g. Aa, BB)");
+  const g = genotype.trim();
+  if (!/^[A-Za-z]{2}$/.test(g)) throw new Error("Genotype must be 2 letter alleles (e.g. Aa, BB)");
+  if (g[0].toUpperCase() !== g[1].toUpperCase()) {
+    throw new Error("Both alleles must describe the same gene (e.g. Aa, BB)");
+  }
   return [g[0], g[1]];
 }
 
 function getGametes(genotype: string): string[] {
   const [a1, a2] = parseGenotype(genotype);
-  return Array.from(new Set([a1, a2])).sort();
+  // Keep duplicate alleles: each parent contributes two equally likely gamete slots.
+  // This makes a homozygous parent produce a 2-column/row Punnett grid, preserving
+  // the correct probability denominator.
+  return [a1, a2];
 }
 
 export function decomposeGenetics(input: GeneticsInput): GeneticsResult {
@@ -180,11 +186,11 @@ const ORBITAL_CAPACITY: Record<string, number> = {
 };
 
 const NOBLE_GASES = [
-  { Z: 0, symbol: "", config: "" },
-  { Z: 2, symbol: "He", config: "1s²" },
-  { Z: 10, symbol: "Ne", config: "[He] 2s² 2p⁶" },
-  { Z: 18, symbol: "Ar", config: "[Ne] 3s² 3p⁶" },
-  { Z: 36, symbol: "Kr", config: "[Ar] 4s² 3d¹⁰ 4p⁶" },
+  { Z: 0, symbol: "", config: "", lastOrbital: "" },
+  { Z: 2, symbol: "He", config: "1s²", lastOrbital: "1s" },
+  { Z: 10, symbol: "Ne", config: "[He] 2s² 2p⁶", lastOrbital: "2p" },
+  { Z: 18, symbol: "Ar", config: "[Ne] 3s² 3p⁶", lastOrbital: "3p" },
+  { Z: 36, symbol: "Kr", config: "[Ar] 4s² 3d¹⁰ 4p⁶", lastOrbital: "4p" },
 ];
 
 function superscript(n: number): string {
@@ -221,11 +227,10 @@ function toNobleGasConfig(Z: number, full: string, orbitals: Record<string, numb
   }
   if (noble.Z === 0) return full;
 
+  const nobleIdx = noble.lastOrbital ? ORBITAL_ORDER.indexOf(noble.lastOrbital) : -1;
+
   const remaining = Object.entries(orbitals)
-    .filter(([orb]) => {
-      const orbZ = ORBITAL_ORDER.indexOf(orb) + 1;
-      return orbZ > noble.Z;
-    })
+    .filter(([orb]) => ORBITAL_ORDER.indexOf(orb) > nobleIdx)
     .map(([orb, count]) => `${orb}${superscript(count)}`)
     .join(" ");
 
@@ -252,7 +257,7 @@ function buildOrbitalDiagram(orbitals: Record<string, number>): string {
 }
 
 function countValenceElectrons(orbitals: Record<string, number>, Z: number): number {
-  const maxShell = Math.ceil(Z / 8) || 1;
+  const maxShell = Math.max(...Object.keys(orbitals).map((orb) => Number(orb[0])));
   let valence = 0;
   for (const [orb, count] of Object.entries(orbitals)) {
     const shell = parseInt(orb[0]);

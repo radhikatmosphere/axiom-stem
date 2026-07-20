@@ -108,6 +108,22 @@ Events (`decompose`, `narrative_generated`, `auth_connect`, `error`) ship to Spl
 
 Narrative Adapter powered by [**SuperGrok (xAI Grok)**](https://x.ai) via the xAI API. Owned by [**radhikatmosphere**](https://github.com/radhikatmosphere).
 
+## AI Tooling — How Codex & GPT-5.6 Were Used
+
+This project was built with the active assistance of two frontier coding models, used for distinct roles:
+
+- **OpenAI Codex (cloud coding agent)** — Used as the primary implementation agent for the deterministic Layer 1 engine and project scaffolding. Codex wrote and iterated on `lib/decomposers.ts` (Punnett-grid genetics, `P(n,r)`/`C(n,r)` combinatorics, Aufbau chemistry, harmonic-series physics), generated the `tests/decomposers.test.mjs` esbuild-bundled test harness, the `bench/` probe scripts, and this repo's `AGENTS.md` conventions. Session references (all from `~/.codex/sessions/2026/07/19/`):
+  - **`019f7d24-6a15-7f02-8eee-67b72267dfe2`** — 19:29, 269 KB — finalization pass for this submission
+  - `019f7cef-7eea-75f0-a8aa-272f43850578` — 18:31, 580 KB — initial scaffold + repo conventions
+  - `019f7cf1-0dad-7523-bc67-1604f9be196b` — 18:33, 54 KB — first Layer 1 pass
+  - `019f7cf0-44fd-7743-8c46-8c36a97cd6a6` — 18:32, 53 KB — Layer 1 stub
+
+- **GPT-5.6** — Used for narrative-design, copywriting, and Devpost/submission packaging: the Layer 2 explanation copy, `submission/DEVPOST_COPYPASTE.md`, `PROJECT_DESCRIPTION.md`, pitch deck, the demo video script (`submission/DEMO_VIDEO_SCRIPT.md`) and Spanish *guión* (`submission/DEMO_GUION.md`), the Chandas/Pingala framing that links Sanskrit prosody to combinatorial decomposition, and the interactive Colab walkthrough notebook [`notebooks/AXIOM_Demo_Codex_GPT56.ipynb`](notebooks/AXIOM_Demo_Codex_GPT56.ipynb) — which mirrors this README section and lets you run Layer 1 live in Colab without spinning up Node.
+
+Division of labor: **Codex = code & tests (Layer 1 determinism)**, **GPT-5.6 = prose, narrative, and submission story (Layer 2 + hackathon docs)**. Both outputs were human-reviewed and committed through version control.
+
+A complete walkthrough — including the four Codex session IDs, the file-by-file map of who wrote what, and live Layer 1 outputs from Python — lives in the notebook above.
+
 ## Related Repos
 
 | Repo | GitHub | Contents |
@@ -126,6 +142,8 @@ Narrative Adapter powered by [**SuperGrok (xAI Grok)**](https://x.ai) via the xA
 | **Submission docs** | [`submission/`](submission/) |
 | **One-pager** | [`submission/PROJECT_DESCRIPTION.md`](submission/PROJECT_DESCRIPTION.md) |
 | **Demo script** | [`submission/DEMO_VIDEO_SCRIPT.md`](submission/DEMO_VIDEO_SCRIPT.md) |
+| **Demo guion (ES)** | [`submission/DEMO_GUION.md`](submission/DEMO_GUION.md) |
+| **Colab walkthrough** | [`notebooks/AXIOM_Demo_Codex_GPT56.ipynb`](notebooks/AXIOM_Demo_Codex_GPT56.ipynb) |
 
 ## License
 
