@@ -1,154 +1,149 @@
-# AXIOM — Adaptive eXplanatory Intelligence via Orthogonal Modeling
+# AXIOM — Verifiable STEM Tutor
 
-**Compute First. Explain Second.**
+> **AXIOM computes STEM answers with deterministic code, then uses OpenAI to explain the verified result at the learner’s level.**
 
-[![Live Demo](https://img.shields.io/badge/demo-live-00F5D4)](https://axiom-stem.pages.dev)
-[![License: MIT](https://img.shields.io/badge/License-MIT-F7B731.svg)](LICENSE)
-[![DSH Hacks V1](https://img.shields.io/badge/hackathon-DSH%20Hacks%20V1-blue)](https://dsh-hacks-v1.devpost.com/)
-[![RadhikaChain](https://img.shields.io/badge/ecosystem-RadhikaChain-00dddd)](https://radhikachain.xyz)
-[![SuperGrok](https://img.shields.io/badge/narrative-SuperGrok%20Grok-7c3aed)](https://x.ai)
+AXIOM is a small educational tutor built around a strict separation of responsibilities:
 
-> Part of the **RADHIKATMOSPHERE** ecosystem · [`radhikatmosphere/axiom-stem`](https://github.com/radhikatmosphere/axiom-stem)
+1. **Compute** — deterministic TypeScript enumerates a STEM result.
+2. **Explain** — OpenAI turns only that evidence into age- and language-adapted prose.
+3. **Verify** — AXIOM checks every cited fact/step ID and flags unsupported numerical, percentage, unit, and formula claims.
 
-## The Problem
+The primary demo is a single-gene genetics cross: **Aa × aa**. Combinatorics is the secondary example.
 
-Most AI tutors **guess** their way through STEM math. Students get confident-sounding explanations that are subtly wrong — especially in genetics probabilities, combinatorics, electron configurations, and physics harmonics.
+## Why this matters
 
-## The Solution: Dual-Engine Architecture
+A fluent explanation is not evidence that a calculation is right. In a conventional AI tutor, the same generative model may both calculate and explain, which makes it hard for a learner or teacher to distinguish a correct derivation from a plausible one.
 
-```
-Layer 1 — Combinatorial Decomposer (TypeScript, zero network, instant)
-    ↓ exact JSON
-Layer 2 — Narrative Adapter (SuperGrok / agent-core / demo)
-    ↓ vivid explanation for ages 13–18
-Student understands structure FIRST, then meaning
-```
+AXIOM makes that boundary visible. The Punnett grid and facts appear before the explanation, every narrative segment links back to stable evidence IDs, and the verifier can return **Verified**, **Warnings**, or **Could not verify**.
 
-## Chandas Inspiration
+## Architecture
 
-Layer 1 follows the **Chandas** (Sanskrit prosody) method — especially **Sragdharā** (4 pādas × 21 syllables, gaṇa feet, yati caesuras). Pingala's *prastāra* enumerated valid rhythmic patterns centuries before modern combinatorics; AXIOM does the same for STEM: decompose into atomic units, enumerate exactly, then narrate meaning.
+    Browser
+      │
+      ├─ Compute locally: genetics or combinatorics (no network)
+      │     └─ AxiomResult: facts, derivations, steps, warnings, engine version
+      │
+      └─ Generate explanation (optional)
+            │
+            ├─ Node API recomputes AxiomResult; it does not trust browser results
+            ├─ OpenAI Responses API receives that result as the sole factual source
+            ├─ Manual schema validation + claim verifier
+            └─ Cited NarrativeResult, or a deterministic fallback if unavailable
 
-| Chandas | AXIOM Layer 1 |
-|---------|---------------|
-| Stanza / pādas | STEM domains |
-| Gaṇa (L/G syllables) | Combinatorial atoms (alleles, C(n,r) steps) |
-| Yati (caesura) | Step boundaries in output |
-| Prastāra | Punnett grids, formula expansion |
+## Why OpenAI is necessary
 
-## Domains
+Deterministic code can enumerate a Punnett grid or evaluate a counting formula, but it does not adapt wording, examples, question prompts, or language to a learner. OpenAI is used for that communication task only. It receives a bounded deterministic record and is explicitly instructed not to recalculate or add facts.
 
-| Domain | Engine | Example |
-|--------|--------|---------|
-| Genetics | Punnett grid enumeration | `Aa × aa` → exact genotype % |
-| Math | P(n,r) / C(n,r) with steps | `C(5,3) = 10` |
-| Chemistry | Aufbau principle | `Fe` → full + noble-gas config |
-| Physics | Harmonic series | `440 Hz` → frequencies + wavelengths |
+When OpenAI is not configured or unavailable, AXIOM remains usable: it shows a deterministic, cited fallback explanation.
 
-## Ecosystem Plan
+## Primary demo flow
 
-AXIOM is the **education-layer application** in the [RadhikaChain ecosystem](https://radhikachain.xyz). Full architecture and whitepaper: [WHITEPAPER.md §9.5](../WHITEPAPER.md) (parent `radhika-chain` repo).
+1. Open the app and select **Genetics**.
+2. Use **Aa** and **aa**, then choose **Compute deterministically**.
+3. Inspect the exact 2×2 Punnett grid, percentages, and the evidence ledger.
+4. Choose a learner level and language, then select **Generate explanation**.
+5. Follow any citation chip back to its fact or step.
+6. Read the verification badge and fallback indicator honestly.
 
-| Surface | URL | Role |
-|---------|-----|------|
-| **This app (live)** | https://axiom-stem.pages.dev | Layer 1 decompose + Layer 2 narrative |
-| Custom domain (planned) | https://axiom.radhikachain.xyz | DNS alias (pending) |
-| Ecosystem landing | https://radhikachain.xyz | Install, Firebase auth hub |
-| Wallet / Bhakti | https://wallet.radhikachain.xyz | Karma tier overlay |
-| Hello-OS | https://radhika-os.pages.dev | OS-level ecosystem entry |
+The Combinatorics tab provides C(5,3) as a second deterministic example.
 
-**Data flow:** Decompose (Layer 1) → Narrative (Layer 2) → Award XP → Optional Bhakti lookup → Persist to D1 `axiom_progress` via `axiom.worker`.
+## Web chat
 
-**Auth:** Google sign-in via Firebase (`radhikatmosphere` project), token verified at `https://radhikachain.xyz/api/auth/firebase`. Setup: [`docs/FIREBASE_AUTH.md`](docs/FIREBASE_AUTH.md).
+AXIOM also ships a chat interface at `/chat`. It accepts short deterministic STEM questions in natural-ish form and returns the same citable, verified result the main tutor produces:
 
-**Integration points:**
-- **Bhakti scores** — wallet link shows ecosystem karma tier
-- **XP / badges / streaks** — Octalysis-aligned White Hat gamification
-- **agent-core** — `/agent/educate` fallback narrative routing via Bedrock/Workers AI
-- **D1 `axiom_progress`** — persistent progress in `radhika-metadata` database
+- `Aa × aa` or "For a cross Aa x aa, calculate the distribution."
+- `C(10,3)` or "How many combinations of 3 from 10?"
+- `P(5,2)` for permutations.
 
-## Quick Start
+The chat route (`app/api/chat/route.ts`) reuses the deterministic engine and the narrative/verifier pipeline, so the verification badge and evidence ledger are identical to the main app. Ambiguous questions are rejected with a clear prompt instead of an invented answer.
 
-```bash
-git clone https://github.com/radhikatmosphere/axiom-stem.git
-cd axiom-stem
-npm install
-cp .env.example .env.local
-# Optional: add XAI_API_KEY (works without it via demo narratives)
-npm run dev
-```
+## Optional Azure AI Foundry narrative provider
 
-Open [http://localhost:3000](http://localhost:3000)
+AXIOM’s explanatory layer can optionally call an Azure AI Foundry agent instead of (or in addition to) the OpenAI Responses provider. Set all three variables to enable it:
 
-## Environment Variables
+| Variable | Required | Purpose |
+|---|---:|---|
+| AZURE_AI_PROJECT_ENDPOINT | No | Azure AI Foundry project endpoint for the agent reference. |
+| AZURE_AI_AGENT_NAME | No | Foundry agent name (e.g. `axiom-ai`). |
+| AZURE_AI_AGENT_VERSION | No | Foundry agent version (e.g. `2`). |
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `XAI_API_KEY` | No | Layer 2 primary (SuperGrok / Grok 4.3) |
-| `AGENT_CORE_URL` | No | RadhikaChain agent-core fallback |
-| `SPLUNK_HEC_URL` + `SPLUNK_HEC_TOKEN` | No | Splunk index `axiom` — see [`docs/SPLUNK_DASHBOARDS.md`](docs/SPLUNK_DASHBOARDS.md) |
-| `WALLET_API_URL` | No | Bhakti API (default: wallet.radhikachain.xyz) |
+Credentials come from `DefaultAzureCredential` (never the browser). If these are unset, AXIOM keeps using OpenAI when available and otherwise the deterministic fallback. The agent must honor AXIOM’s output contract (cited segments + verification status); malformed output falls back to the deterministic narrative.
 
-## Deploy
+## Local setup
 
-```bash
-# Cloudflare Pages (verified production path)
-npm run pages:deploy
+Install dependencies with the lockfile:
 
-# Vercel (optional alternative)
-npm run build && npx vercel --prod
-```
+    npm install
 
-Set `XAI_API_KEY` and Splunk vars in your hosting dashboard.
+Copy the template if you want live OpenAI narration:
 
-## Observability (Splunk)
+    cp .env.example .env.local
 
-Events (`decompose`, `narrative_generated`, `auth_connect`, `error`) ship to Splunk index **`axiom`**. Full Dashboard Studio guide with SPL panels: [**docs/SPLUNK_DASHBOARDS.md**](docs/SPLUNK_DASHBOARDS.md).
+Run the app:
 
-## SuperGrok Attribution
+    npm run dev
 
-Narrative Adapter powered by [**SuperGrok (xAI Grok)**](https://x.ai) via the xAI API. Owned by [**radhikatmosphere**](https://github.com/radhikatmosphere).
+Open http://localhost:3000.
 
-## AI Tooling — How Codex & GPT-5.6 Were Used
+### Environment variables
 
-This project was built with the active assistance of two frontier coding models, used for distinct roles:
+| Variable | Required | Purpose |
+|---|---:|---|
+| OPENAI_API_KEY | No | Server-only OpenAI credential for generated narration. |
+| OPENAI_MODEL | No | A valid model ID available to your OpenAI account. No default model is assumed. |
 
-- **OpenAI Codex (cloud coding agent)** — Used as the primary implementation agent for the deterministic Layer 1 engine and project scaffolding. Codex wrote and iterated on `lib/decomposers.ts` (Punnett-grid genetics, `P(n,r)`/`C(n,r)` combinatorics, Aufbau chemistry, harmonic-series physics), generated the `tests/decomposers.test.mjs` esbuild-bundled test harness, the `bench/` probe scripts, and this repo's `AGENTS.md` conventions. Session references (all from `~/.codex/sessions/2026/07/19/`):
-  - **`019f7d24-6a15-7f02-8eee-67b72267dfe2`** — 19:29, 269 KB — finalization pass for this submission
-  - `019f7cef-7eea-75f0-a8aa-272f43850578` — 18:31, 580 KB — initial scaffold + repo conventions
-  - `019f7cf1-0dad-7523-bc67-1604f9be196b` — 18:33, 54 KB — first Layer 1 pass
-  - `019f7cf0-44fd-7743-8c46-8c36a97cd6a6` — 18:32, 53 KB — Layer 1 stub
+Set both variables to enable OpenAI narration. Do not use NEXT_PUBLIC_ for either value and do not commit .env.local.
 
-- **GPT-5.6** — Used for narrative-design, copywriting, and Devpost/submission packaging: the Layer 2 explanation copy, `submission/DEVPOST_COPYPASTE.md`, `PROJECT_DESCRIPTION.md`, pitch deck, the demo video script (`submission/DEMO_VIDEO_SCRIPT.md`) and Spanish *guión* (`submission/DEMO_GUION.md`), the Chandas/Pingala framing that links Sanskrit prosody to combinatorial decomposition, and the interactive Colab walkthrough notebook [`notebooks/AXIOM_Demo_Codex_GPT56.ipynb`](notebooks/AXIOM_Demo_Codex_GPT56.ipynb) — which mirrors this README section and lets you run Layer 1 live in Colab without spinning up Node.
+The API route requires a Node.js-capable Next.js deployment. Static-only hosting cannot serve the server-side OpenAI endpoint without a separate backend.
 
-Division of labor: **Codex = code & tests (Layer 1 determinism)**, **GPT-5.6 = prose, narrative, and submission story (Layer 2 + hackathon docs)**. Both outputs were human-reviewed and committed through version control.
+## Validation and evaluation
 
-A complete walkthrough — including the four Codex session IDs, the file-by-file map of who wrote what, and live Layer 1 outputs from Python — lives in the notebook above.
+    npm run typecheck
+    npm run lint
+    npm test
+    npm run benchmark
+    npm run eval
+    npm run build
 
-## Related Repos
+The checked-in latest reports are [benchmark results](reports/BENCHMARK_LATEST.md) and [verification evaluation](reports/EVALUATION_LATEST.md).
 
-| Repo | GitHub | Contents |
-|------|--------|----------|
-| **axiom-stem** | https://github.com/radhikatmosphere/axiom-stem | This app — Next.js 15 STEM tutor (MIT) |
-| **radhika-chain** | https://github.com/radhikatmosphere/radhika-chain | L1 blockchain, Workers, agent-core, whitepaper |
+Actual local run recorded on 2026-07-20:
 
-## Hackathon Submission (DSH Hacks V1)
+- Deterministic benchmark: **389/389** cases passed, including exhaustive safe-range genetics invariants and independent BigInt combinatorics references.
+- Verifier evaluation: **8/8** adversarial fixtures passed.
+- Network evaluation: skipped because it is opt-in and requires both OpenAI variables plus OPENAI_EVAL=1.
 
-| Item | Link |
-|------|------|
-| **Live demo** | https://axiom-stem.pages.dev |
-| **Demo video** | [`submission/AXIOM_DEMO_VIDEO.mp4`](submission/AXIOM_DEMO_VIDEO.mp4) — real UI + natural voiceover |
-| **Re-record video** | `npm run demo:record` |
-| **Devpost** | https://dsh-hacks-v1.devpost.com/ |
-| **Submission docs** | [`submission/`](submission/) |
-| **One-pager** | [`submission/PROJECT_DESCRIPTION.md`](submission/PROJECT_DESCRIPTION.md) |
-| **Demo script** | [`submission/DEMO_VIDEO_SCRIPT.md`](submission/DEMO_VIDEO_SCRIPT.md) |
-| **Demo guion (ES)** | [`submission/DEMO_GUION.md`](submission/DEMO_GUION.md) |
-| **Colab walkthrough** | [`notebooks/AXIOM_Demo_Codex_GPT56.ipynb`](notebooks/AXIOM_Demo_Codex_GPT56.ipynb) |
+Local latency is reported separately from network latency in the benchmark JSON. It is machine-specific and should not be treated as a production latency claim.
+
+## Limitations
+
+- Genetics currently models a single gene with two allele slots; it is not a substitute for genetic counseling or a representation of complex inheritance.
+- The verifier is a claim-level guardrail, not a proof that all natural-language assertions are true.
+- Only genetics and combinatorics are in the primary product flow. Chemistry and physics helpers remain outside this submitted demo path.
+- Sanskrit prosody is disabled until source-backed rules, licensed fixtures, and expert validation exist. See [the experimental design note](docs/CHANDAS_EXPERIMENT.md).
+- OpenAI output can fail or time out; AXIOM will visibly fall back rather than pretending an AI explanation was generated.
+
+## Security and privacy
+
+See [SECURITY.md](SECURITY.md) for data flow, controls, and remaining risks. AXIOM does not persist learner accounts or inputs in this submission app.
+
+## Screenshots
+
+**TODO before final Devpost upload:** capture the current 1280×720 Genetics compute, cited explanation, fallback, and Combinatorics screens. The required placeholder list is in [submission/Screenshots/README.md](submission/Screenshots/README.md).
+
+## Submission materials
+
+- [Devpost-ready copy](submission/DEVPOST_FINAL.md)
+- [90-second demo script](submission/DEMO_SCRIPT_90_SECONDS.md)
+- [Judging rubric map](submission/JUDGING_RUBRIC_MAP.md)
+- [Submission architecture](submission/ARCHITECTURE.md)
+- [Submission limitations](submission/LIMITATIONS.md)
+
+## Attribution
+
+AXIOM uses Next.js, React, TypeScript, Tailwind CSS, and the official OpenAI Node SDK listed in package.json. Deterministic computations and validation fixtures are implemented in this repository. No performance, model, or academic claims are made beyond the code and reports included here.
 
 ## License
 
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
-Copyright (c) 2026 [RADHIKATMOSPHERE](https://github.com/radhikatmosphere)
-
-Built for **DSH Hacks V1** · AI × STEM Education
