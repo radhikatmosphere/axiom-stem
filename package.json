@@ -26,7 +26,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint app components lib tests bench types --max-warnings=0",
-    "test": "node tests/decomposers.test.mjs && node tests/narrative-verifier.test.mjs && node tests/chat.test.mjs",
+    "test": "node tests/decomposers.test.mjs && node tests/narrative-verifier.test.mjs && node tests/chat.test.mjs && node tests/chat-router.test.mjs",
     "benchmark": "node bench/run-benchmark.mjs",
     "eval": "node bench/run-eval.mjs",
     "submission:zip": "bash scripts/build-submission-zip.sh"

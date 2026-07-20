@@ -1,16 +1,30 @@
 "use client";
 
-import { useState, useRef, useEffect, FormEvent } from "react";
+import { useState, useRef, useEffect, useMemo, FormEvent } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Lightbulb, MessageSquare, Send, ShieldAlert, Sparkles, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Lightbulb, MessageSquare, Send, ShieldAlert, Sparkles, XCircle, BookOpen, Library } from "lucide-react";
 import type { ChatResult } from "@/lib/foundry-adapter";
 import { CHAT_EXAMPLES } from "@/lib/chat-question";
+
+type AxiomMessageKind =
+  | "deterministic"
+  | "interpretation"
+  | "warning"
+  | "silent";
 
 interface ChatMessage {
   id: string;
   author: "user" | "axiom";
   text: string;
+  /** Deterministic verified bubble (green tag path). */
   chat?: ChatResult;
+  /** Interpretation bubble — same shape as the deterministic one but the route marked it as interpretation (yellow tag). */
+  interpretation?: ChatResult;
+  /** Off-topic warning copy. */
+  warning?: string;
+  /** True for the silent "stayed on topic" bubble. */
+  silent?: boolean;
+  /** Hard error (network/4xx). */
   error?: string;
 }
 
@@ -33,7 +47,7 @@ const VERIFICATION_BADGE = {
 } as const;
 
 const SAMPLE_LLM_ERROR =
-  "Demonstration only — AXIOM cannot answer arbitrary questions. It computes deterministic genetics and combinatorics, then explains the cited result.";
+  "AXIOM only answers deterministic STEM questions and verifiable educational follow-ups about them. Try \"Aa × aa\" or \"C(10,3)\" to start.";
 
 function uid(): string {
   return Math.random().toString(36).slice(2, 10);
@@ -122,9 +136,36 @@ function ChatBubble({ message }: { message: ChatMessage }) {
     );
   }
 
-  if (!message.chat) return null;
-  const chat = message.chat;
-  const badge = VERIFICATION_BADGE[chat.verification.status];
+  if (message.silent) {
+    return (
+      <div className="flex justify-start">
+        <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-white/10 bg-panel/40 px-4 py-3 text-sm text-white/55 italic">
+          AXIOM stayed on STEM and did not answer. Send <code className="text-cyan">Aa × aa</code> or <code className="text-cyan">C(10,3)</code> to resume.
+        </div>
+      </div>
+    );
+  }
+
+  if (message.warning) {
+    return (
+      <div className="flex justify-start">
+        <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
+          <p className="mb-1 flex items-center gap-2"><ShieldAlert size={14} /> Off-topic guardrail</p>
+          {message.warning}
+          <p className="mt-2 text-[11px] text-amber-50/70">
+            A second off-topic message is left unanswered. This interpretation is recorded in the audit trail for transparency.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const chat = message.chat ?? message.interpretation;
+  if (!chat) return null;
+  const isInterpretation = Boolean(message.interpretation);
+  const badge = isInterpretation
+    ? { label: "Interpretation", class: "bg-amber-300/15 text-amber-100 border-amber-300/30", Icon: BookOpen }
+    : VERIFICATION_BADGE[chat.verification.status];
   const BadgeIcon = badge.Icon;
 
   return (
@@ -132,8 +173,10 @@ function ChatBubble({ message }: { message: ChatMessage }) {
       <div className="w-full max-w-[90%] rounded-2xl rounded-bl-sm border border-white/10 bg-panel/80 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <MessageSquare size={15} className="text-cyan" />
-            <span className="text-sm font-semibold">{chat.domainLabel}</span>
+            {isInterpretation ? <BookOpen size={15} className="text-amber-200" /> : <MessageSquare size={15} className="text-cyan" />}
+            <span className="text-sm font-semibold">
+              {isInterpretation ? "Interpretation of last result" : `${chat.domainLabel} · deterministic`}
+            </span>
             <span className="text-xs text-white/50">engine v{chat.engineVersion}</span>
           </div>
           <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${badge.class}`}>
@@ -191,12 +234,14 @@ function ChatBubble({ message }: { message: ChatMessage }) {
 }
 
 export default function ChatPage() {
+  // Client-generated random session id; no account. Used only by the off-topic
+  // memory + last-result buffer on the server.
+  const sessionId = useMemo(() => Math.random().toString(36).slice(2, 12), []);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "intro",
       author: "axiom",
       text: "",
-      chat: undefined,
       error: SAMPLE_LLM_ERROR,
     },
   ]);
@@ -220,18 +265,36 @@ export default function ChatPage() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, learner: { level: "high-school", language: "en" } }),
+        body: JSON.stringify({
+          question,
+          sessionId,
+          learner: { level: "high-school", language: "en" },
+        }),
       });
-      const payload = await response.json() as { error?: string; chat?: ChatResult };
-      if (!response.ok || !payload.chat) {
+      const payload = await response.json() as {
+        error?: string;
+        chat?: ChatResult;
+        mode?: "openai" | "deterministic_fallback" | "interpretation" | "warning" | "silent";
+        warning?: string;
+      };
+
+      if (!response.ok) {
         setMessages((prev) => [...prev, {
           id: uid(),
           author: "axiom",
           text: "",
           error: payload.error || "Could not generate a chat answer.",
         }]);
-      } else {
+      } else if (payload.mode === "silent") {
+        setMessages((prev) => [...prev, { id: uid(), author: "axiom", text: "", silent: true }]);
+      } else if (payload.mode === "warning") {
+        setMessages((prev) => [...prev, { id: uid(), author: "axiom", text: "", warning: payload.warning }]);
+      } else if (payload.mode === "interpretation" && payload.chat) {
+        setMessages((prev) => [...prev, { id: uid(), author: "axiom", text: "", interpretation: payload.chat }]);
+      } else if (payload.chat) {
         setMessages((prev) => [...prev, { id: uid(), author: "axiom", text: "", chat: payload.chat }]);
+      } else {
+        setMessages((prev) => [...prev, { id: uid(), author: "axiom", text: "", error: "Unexpected response from AXIOM." }]);
       }
     } catch {
       setMessages((prev) => [...prev, {
@@ -267,7 +330,7 @@ export default function ChatPage() {
       <main className="mx-auto max-w-4xl px-4 py-6">
         <section className="mb-4 rounded-xl border border-white/10 bg-panel/60 p-4 text-sm text-white/75">
           <p className="mb-1 flex items-center gap-2 text-cyan"><Sparkles size={14} /> Compute first, explain with citations</p>
-          <p>Ask AXIOM a deterministic STEM question. AXIOM computes the answer locally, then optional OpenAI narration cites each fact/step id. The verification badge is always honest.</p>
+          <p>Ask a deterministic question (e.g. <code className="text-cyan">Aa × aa</code>). You may then ask a free-text follow-up about that result — AXIOM returns it as an amber <em>Interpretation</em> tag and still runs every numerical claim through the verifier. Off-topic questions are warned once, then return no answer.</p>
         </section>
 
         <div ref={scrollRef} className="mb-4 h-[60vh] space-y-3 overflow-y-auto rounded-xl border border-white/10 bg-void/30 p-4">
@@ -311,6 +374,9 @@ export default function ChatPage() {
 
         <p className="mt-3 flex items-center gap-1 text-xs text-white/45">
           <ArrowRight size={12} /> Deterministic fallback is always shown if OpenAI is not configured.
+        </p>
+        <p className="mt-2 flex items-center gap-1 text-xs text-white/45">
+          <Library size={12} /> Judges: every chat decision is auditable (no PII by default) at <a href="/api/audit/recent?limit=20" className="text-cyan hover:underline" target="_blank" rel="noreferrer">/api/audit/recent</a>.
         </p>
       </main>
     </div>

@@ -57,6 +57,28 @@ AXIOM also ships a chat interface at `/chat`. It accepts short deterministic STE
 
 The chat route (`app/api/chat/route.ts`) reuses the deterministic engine and the narrative/verifier pipeline, so the verification badge and evidence ledger are identical to the main app. Ambiguous questions are rejected with a clear prompt instead of an invented answer.
 
+### Chat behaviour
+
+AXIOM chat has three honest response modes — no LLM is allowed to calculate an answer, only to interpret one that already exists.
+
+| Turn type | Example | Result | Badge | Audit |
+|---|---|---|---|---|
+| **Deterministic** | `Aa × aa` or `C(10,3)` | Exact grid/formula + cited narrative, same as `/` | green Verified (or deterministic fallback) | `decision: deterministic` |
+| **Educational follow-up** | "why is Aa dominant?" (after a deterministic answer) | Free-text interpretation of the most recent deterministic record only; segment must still cite evidence IDs; no new numbers allowed | amber **Interpretation** tag — never Verified | `decision: educational_followup` |
+| **Off-topic** | "what's the weather?" / medical / financial / religious | One warning reply that re-points to STEM; the second consecutive off-topic message returns no answer at all (silent) — the UI shows a grey "stayed on STEM" bubble | n/a | `decision: off_topic_warning` then `off_topic_silent` |
+
+The classifier that decides which path is purely lexical (regex + IDs from the last deterministic result) — *the guardrail itself never uses a model*, because that would make it untrustworthy.
+
+### Audit trail (for judges)
+
+Every chat decision is written to a server-side JSONL file (`logs/chat-trace.jsonl`, never committed, never logged with full question text by default). A read-only viewer endpoint exposes the most recent decisions so judges can verify why AXIOM answered each way:
+
+```
+GET /api/audit/recent?limit=20
+```
+
+The viewer is rate-limited and sends `X-Robots-Tag: noindex`. To include the raw user question in the audit (for debugging), start the server with `AXIOM_AUDIT_FULL=1`. By default only a short FNV-1a hash and length are stored.
+
 ## Optional Azure AI Foundry narrative provider
 
 AXIOM’s explanatory layer can optionally call an Azure AI Foundry agent instead of (or in addition to) the OpenAI Responses provider. Set all three variables to enable it:
