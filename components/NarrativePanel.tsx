@@ -1,92 +1,115 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { BookOpen, Copy, Check, Sparkles } from "lucide-react";
-import { useState } from "react";
+import type { NarrativeResult, VerificationStatus } from "@/types";
 
 interface NarrativePanelProps {
-  narrative: string | null;
-  provider: string | null;
+  narrative: NarrativeResult | null;
   loading: boolean;
+  error: string | null;
 }
 
-function renderMarkdown(text: string) {
-  return text.split("\n").map((line, i) => {
-    const parts = line.split(/(\*\*[^*]+\*\*)/g);
-    return (
-      <p key={i} className="mb-2 last:mb-0">
-        {parts.map((part, j) =>
-          part.startsWith("**") && part.endsWith("**") ? (
-            <strong key={j} className="text-cyan font-semibold">
-              {part.slice(2, -2)}
-            </strong>
-          ) : (
-            <span key={j}>{part}</span>
-          )
-        )}
-      </p>
-    );
-  });
-}
+const statusLabel: Record<VerificationStatus, string> = {
+  verified: "Verified",
+  warnings: "Warnings",
+  could_not_verify: "Could not verify",
+};
 
-export default function NarrativePanel({ narrative, provider, loading }: NarrativePanelProps) {
-  const [copied, setCopied] = useState(false);
+const statusClass: Record<VerificationStatus, string> = {
+  verified: "bg-emerald-400/15 text-emerald-200 border-emerald-300/30",
+  warnings: "bg-amber-300/15 text-amber-100 border-amber-300/30",
+  could_not_verify: "bg-red-400/15 text-red-100 border-red-300/30",
+};
 
-  async function copy() {
-    if (!narrative) return;
-    await navigator.clipboard.writeText(narrative);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  const providerLabel =
-    provider === "supergrok" ? "SuperGrok (Grok 4.3)" : provider === "agent-core" ? "RadhikaChain Agent-Core" : "Demo Narrative";
-
+function CitationLinks({ citations }: { citations: string[] }) {
+  if (!citations.length) return null;
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="axiom-card min-h-[200px]"
-    >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold flex items-center gap-2">
-          <BookOpen size={16} className="text-gold" />
-          Layer 2 — Narrative Adapter
-        </h3>
+    <span className="ml-2 inline-flex flex-wrap gap-1 align-baseline">
+      {citations.map((citation) => (
+        <a
+          key={citation}
+          href={`#evidence-${citation}`}
+          className="rounded bg-cyan/10 px-1.5 py-0.5 font-mono text-[11px] text-cyan hover:bg-cyan/20 focus:outline-none focus:ring-2 focus:ring-cyan"
+          aria-label={`View evidence ${citation}`}
+        >
+          {citation}
+        </a>
+      ))}
+    </span>
+  );
+}
+
+export default function NarrativePanel({ narrative, loading, error }: NarrativePanelProps) {
+  return (
+    <section className="axiom-card min-h-[220px]" aria-labelledby="explanation-heading">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold">2. Explain</p>
+          <h2 id="explanation-heading" className="text-lg font-semibold">Evidence-linked explanation</h2>
+        </div>
         {narrative && (
-          <button onClick={copy} className="axiom-btn-secondary p-2 text-xs flex items-center gap-1">
-            {copied ? <Check size={12} /> : <Copy size={12} />}
-            {copied ? "Copied" : "Copy"}
-          </button>
+          <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusClass[narrative.verification.status]}`}>
+            {statusLabel[narrative.verification.status]}
+          </span>
         )}
       </div>
 
       {loading && (
-        <div className="space-y-3">
-          <div className="h-4 shimmer-bg rounded w-full" />
-          <div className="h-4 shimmer-bg rounded w-5/6" />
-          <div className="h-4 shimmer-bg rounded w-4/6" />
-          <p className="text-xs text-white/40 flex items-center gap-1 mt-4">
-            <Sparkles size={12} className="animate-pulse text-cyan" />
-            Meaning appears after truth is computed…
-          </p>
+        <div className="space-y-3" aria-live="polite" aria-busy="true">
+          <div className="h-4 w-full rounded shimmer-bg" />
+          <div className="h-4 w-5/6 rounded shimmer-bg" />
+          <div className="h-4 w-3/5 rounded shimmer-bg" />
+          <p className="text-sm text-white/55">Generating an explanation from the deterministic evidence…</p>
         </div>
       )}
 
-      {!loading && !narrative && (
-        <p className="text-sm text-white/40 italic">
-          Decompose a problem above — the narrative will appear automatically.
+      {!loading && error && (
+        <p className="rounded-lg border border-red-300/30 bg-red-400/10 p-3 text-sm text-red-100" role="alert">
+          {error}
+        </p>
+      )}
+
+      {!loading && !error && !narrative && (
+        <p className="text-sm text-white/55">
+          Compute a result, then choose “Generate explanation.” Citations will link back to the evidence panel.
         </p>
       )}
 
       {!loading && narrative && (
-        <>
-          <div className="text-sm text-white/80 leading-relaxed">{renderMarkdown(narrative)}</div>
-          <p className="text-xs text-white/30 mt-4 pt-3 border-t border-white/5">
-            via {providerLabel} · RadhikaChain ecosystem
-          </p>
-        </>
+        <div className="space-y-4 text-sm leading-6 text-white/85">
+          <div className="rounded-lg border border-white/10 bg-void/40 p-4">
+            <p>
+              {narrative.summary}
+              <CitationLinks citations={narrative.summaryCitations} />
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {narrative.explanationSegments.map((segment) => (
+              <p key={segment.id}>
+                {segment.text}
+                <CitationLinks citations={segment.citations} />
+              </p>
+            ))}
+          </div>
+
+          {narrative.followUpQuestions.length > 0 && (
+            <div className="rounded-lg border border-gold/20 bg-gold/5 p-4">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-gold">Try next</p>
+              {narrative.followUpQuestions.map((question) => <p key={question}>{question}</p>)}
+            </div>
+          )}
+
+          <div className="border-t border-white/10 pt-3 text-xs text-white/55">
+            <p>
+              {narrative.provider === "openai"
+                ? "OpenAI-generated narrative; deterministic evidence remains the source of truth."
+                : "Deterministic fallback mode; no OpenAI response was used."}
+            </p>
+            {narrative.fallbackReason && <p className="mt-1">Fallback reason: {narrative.fallbackReason.replaceAll("_", " ")}.</p>}
+            {narrative.verification.warnings.map((warning) => <p key={warning} className="mt-1 text-amber-100">{warning}</p>)}
+          </div>
+        </div>
       )}
-    </motion.div>
+    </section>
   );
 }
