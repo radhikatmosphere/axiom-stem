@@ -1,0 +1,103 @@
+1
+00:00:00,000 --> 00:00:06,500
+AXIOM computes STEM answers with deterministic code,
+
+2
+00:00:06,500 --> 00:00:15,000
+then uses OpenAI only to explain the verified result.
+
+3
+00:00:15,000 --> 00:00:24,000
+This is the primary demo: a single-gene genetics cross, Aa times aa.
+
+4
+00:00:24,000 --> 00:00:37,000
+Before any AI text appears, AXIOM enumerates the exact two-by-two Punnett grid.
+
+5
+00:00:37,000 --> 00:00:50,000
+The genotype probabilities, fifty percent Aa, fifty percent aa,
+
+6
+00:00:50,000 --> 00:01:00,000
+come from direct enumeration, not from a language model.
+
+7
+00:01:00,000 --> 00:01:10,000
+The result is packaged as stable facts and steps.
+
+8
+00:01:10,000 --> 00:01:18,000
+Each one has an ID, like genetics-dot-probability-dot-Aa.
+
+9
+00:01:18,000 --> 00:01:25,000
+Those are the only evidence IDs the explanation is allowed to cite.
+
+10
+00:01:25,000 --> 00:01:35,000
+On the server, AXIOM recomputes the deterministic result,
+
+11
+00:01:35,000 --> 00:01:45,000
+sends that record to OpenAI, validates the JSON, and verifies every claim.
+
+12
+00:01:45,000 --> 00:01:53,000
+OpenAI adapts the wording to the learner's level and language,
+
+13
+00:01:53,000 --> 00:02:00,000
+it does not recalculate the cross.
+
+14
+00:02:00,000 --> 00:02:08,000
+Citation chips link each sentence back to the evidence ledger.
+
+15
+00:02:08,000 --> 00:02:15,000
+A green Verified badge means every citation is valid
+
+16
+00:02:15,000 --> 00:02:22,000
+and every number is in the deterministic allowlist.
+
+17
+00:02:22,000 --> 00:02:35,000
+If a citation is missing, a number changes,
+
+18
+00:02:35,000 --> 00:02:45,000
+or the model output is malformed, AXIOM honestly shows Warnings
+
+19
+00:02:45,000 --> 00:02:55,000
+or Could not verify.
+
+20
+00:02:55,000 --> 00:03:05,000
+AXIOM also ships a chat interface.
+
+21
+00:03:05,000 --> 00:03:20,000
+Ask Aa times aa or C-of-ten-three in plain text,
+
+22
+00:03:20,000 --> 00:03:35,000
+the same deterministic engine answers, with the same verification badge.
+
+23
+00:03:35,000 --> 00:03:50,000
+No API key? The flow still works:
+
+24
+00:03:50,000 --> 00:04:05,000
+AXIOM shows a clearly labeled deterministic fallback.
+
+25
+00:04:05,000 --> 00:04:30,000
+Compute first. Explain with citations. Verify every claim.
+
+26
+00:04:30,000 --> 00:04:45,000
+That's AXIOM.

@@ -39,3 +39,6 @@ next-env.d.ts
 # demo recorder temp files
 submission/demo-tmp/
 submission/zip-staging/
+
+# benchmark/evaluation JSON (markdown versions are tracked)
+/reports/*.json
